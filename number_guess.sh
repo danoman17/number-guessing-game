@@ -4,8 +4,7 @@
 PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 
 #generates a random number between 1 - 1000
-#RANDOM_NUMBER=$(( 1 + $RANDOM % 1000 ))
-RANDOM_NUMBER=500
+RANDOM_NUMBER=$(( 1 + $RANDOM % 1000 ))
 
 is_integer() {
   [[ $1 =~ ^[0-9]+$ ]]
@@ -66,6 +65,52 @@ not_player_read_number_input(){
 
 }
 
+player_read_number_input() {
+echo -e "\nGuess the secret number between 1 and 1000:"
+
+  # counter for attemps
+  COUNT=0
+
+  while :; do
+    
+    read GUESS_NUMBER
+
+    # validate the input to be a integer
+    if is_integer $GUESS_NUMBER; then
+      ((COUNT++))
+      
+      # Condition to break the loop
+      if check_number $GUESS_NUMBER; then
+      
+        # if number guessed, insert new user info into DB 
+        
+        GAMES_PLAYED="$($PSQL "SELECT games_played FROM user_info WHERE name='$1'")"
+        ((GAMES_PLAYED++))
+        
+        BEST_GAME="$($PSQL "SELECT best_game FROM user_info WHERE name='$1'")"
+        
+        # compare and upload best game 
+        if [[ $COUNT -le $BEST_GAME ]]; then
+          BEST_GAME=$COUNT
+        fi
+
+        UPDATE_USER_INFO_RESULT="$($PSQL "UPDATE user_info SET games_played = $GAMES_PLAYED , best_game = $BEST_GAME WHERE name='$1'")"
+
+        echo -e "\nYou guessed it in $COUNT tries. The secret number was $RANDOM_NUMBER. Nice job!"
+        
+        break
+
+      fi
+    else
+
+      echo -e "\nThat is not an integer, guess again:"
+      
+    fi
+
+  done
+
+}
+
 
 
 
@@ -79,16 +124,17 @@ USER_ID="$($PSQL "SELECT user_id FROM user_info WHERE name='$USER_NAME'")"
 
 if [[ -z $USER_ID ]]
 then
+  
   echo -e "\nWelcome, $USER_NAME! It looks like this is your first time here."
-
   not_player_read_number_input $USER_NAME
 else
   
-  #TODO: get games_played and best_game from DB.
+  # get games_played and best_game from DB.
+  GAMES_PLAYED="$($PSQL "SELECT games_played FROM user_info WHERE name='$USER_NAME'")"
+  BEST_GAME="$($PSQL "SELECT best_game FROM user_info WHERE name='$USER_NAME'")"
+  echo -e "\nWelcome back, $USER_NAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 
-  echo -e "\nWelcome back, $USER_NAME! You have played <games_played> games, and your best game took <best_game> guesses."
-
-  # read_number_input
+  player_read_number_input $USER_NAME
 
 fi
 
