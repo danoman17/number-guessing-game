@@ -66,7 +66,6 @@ not_player_read_number_input(){
 }
 
 player_read_number_input() {
-echo -e "\nGuess the secret number between 1 and 1000:"
 
   # counter for attemps
   COUNT=0
@@ -126,6 +125,7 @@ if [[ -z $USER_ID ]]
 then
   
   echo -e "\nWelcome, $USER_NAME! It looks like this is your first time here."
+  echo -e "\nGuess the secret number between 1 and 1000:"
   not_player_read_number_input $USER_NAME
 else
   
@@ -133,6 +133,7 @@ else
   GAMES_PLAYED="$($PSQL "SELECT games_played FROM user_info WHERE name='$USER_NAME'")"
   BEST_GAME="$($PSQL "SELECT best_game FROM user_info WHERE name='$USER_NAME'")"
   echo -e "\nWelcome back, $USER_NAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
+  echo -e "\nGuess the secret number between 1 and 1000:"
 
   player_read_number_input $USER_NAME
 
