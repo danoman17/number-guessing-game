@@ -10,7 +10,8 @@ is_integer() {
   [[ $1 =~ ^[0-9]+$ ]]
 }
 
-check_number() { # guides for user's attemps and check input
+# guides for user's attemps and check input
+check_number() { 
 
   if [[ $1 < $RANDOM_NUMBER ]]
   then
@@ -28,10 +29,7 @@ check_number() { # guides for user's attemps and check input
 
 not_player_read_number_input(){
 
-  echo -e "\nGuess the secret number between 1 and 1000:"
-
-  # counter for attemps
-  COUNT=0
+  COUNT=0  # counter for attemps
 
   while :; do
     
@@ -66,9 +64,8 @@ not_player_read_number_input(){
 }
 
 player_read_number_input() {
-
-  # counter for attemps
-  COUNT=0
+  
+  COUNT=0  # counter for attemps
 
   while :; do
     
@@ -76,6 +73,7 @@ player_read_number_input() {
 
     # validate the input to be a integer
     if is_integer $GUESS_NUMBER; then
+
       ((COUNT++))
       
       # Condition to break the loop
@@ -100,17 +98,14 @@ player_read_number_input() {
         break
 
       fi
+      
     else
 
       echo -e "\nThat is not an integer, guess again:"
       
     fi
-
   done
-
 }
-
-
 
 
 echo -e "\n~~~~~~ Welcome to the Guessing Number Game ~~~~~~"
@@ -121,12 +116,15 @@ read USER_NAME
 
 USER_ID="$($PSQL "SELECT user_id FROM user_info WHERE name='$USER_NAME'")"
 
+# check if the user already in the DB 
 if [[ -z $USER_ID ]]
 then
-  
+
   echo -e "\nWelcome, $USER_NAME! It looks like this is your first time here."
   echo -e "\nGuess the secret number between 1 and 1000:"
+
   not_player_read_number_input $USER_NAME
+
 else
   
   # get games_played and best_game from DB.
